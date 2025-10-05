@@ -49,7 +49,7 @@ export const StudyView = ({ session, onExit }) => {
     
     // Reset ref
     statsRef.current = { correct: 0, reviewed: 0 };
-  }, [session, progress]);
+  }, [session]);
 
   const handleReview = (quality) => {
     const card = session.cards[currentIndex];
@@ -104,10 +104,14 @@ export const StudyView = ({ session, onExit }) => {
           `You reviewed ${finalStats.total} cards with ${Math.round((finalStats.correct / finalStats.total) * 100)}% accuracy.`,
           'success'
         );
-        onExit();
+        onExit(finalStats);
       }
     }, 300);
   };
+
+  if (!session.cards[currentIndex]) {
+    return null;
+  }
 
   const currentCard = session.cards[currentIndex];
   const progressPercent = (stats.reviewed / session.cards.length) * 100;
@@ -190,7 +194,7 @@ export const StudyView = ({ session, onExit }) => {
 
         <div className="flex justify-between items-center mt-4 border-t border-slate-700 pt-4">
           <button
-            onClick={onExit}
+            onClick={() => onExit(null)}
             className="text-gray-400 hover:text-white text-sm"
           >
             Exit

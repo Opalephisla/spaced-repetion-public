@@ -4,6 +4,7 @@ import { useApp } from '../context/AppContext';
 export const useNotifications = () => {
   const {
     notificationsEnabled,
+    decks,
     cards,
     progress,
     notifiedIds,
@@ -28,7 +29,9 @@ export const useNotifications = () => {
       if (newDueCards.length > 0) {
         newDueCards.forEach((card, index) => {
           setTimeout(() => {
-            const message = `Card ready: "${card.question.substring(0, 40)}..."`;
+            const deck = decks.find(d => d.id === card.deckId);
+            const deckName = deck ? deck.name : 'your deck';
+            const message = `You have cards due in the "${deckName}" deck.`;
             addNotification('Time to Study!', message, 'study');
           }, index * 400);
         });
@@ -43,5 +46,5 @@ export const useNotifications = () => {
     checkDueCards(); // Initial check
 
     return () => clearInterval(interval);
-  }, [notificationsEnabled, cards, progress, notifiedIds, setNotifiedIds, addNotification]);
+  }, [notificationsEnabled, decks, cards, progress, notifiedIds, setNotifiedIds, addNotification]);
 };

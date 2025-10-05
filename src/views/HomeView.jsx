@@ -102,7 +102,7 @@ export const HomeView = ({ onStartStudy, onShowHistory }) => {
     <div className="min-h-screen text-white px-4 py-4">
       <Navbar onHistoryClick={onShowHistory} onHomeClick={() => {}} />
 
-      <main className="max-w-4xl mx-auto">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
         <div className="text-center mb-12">
           <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4">
@@ -127,49 +127,48 @@ export const HomeView = ({ onStartStudy, onShowHistory }) => {
 
         {/* Last Session Stats */}
         {lastSession && (
-          <div className="mb-8 bg-slate-800 rounded-xl p-6 border border-slate-700">
-            <h3 className="text-xl font-bold text-white mb-4">Recent Study Session</h3>
-            <div className="flex justify-between items-center bg-slate-700/50 p-4 rounded-lg">
-              <div>
-                <p className="text-sm text-gray-400">Deck</p>
-                <p className="text-lg font-semibold text-white">{lastSession.deckName}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-sm text-gray-400">Accuracy</p>
-                <p className="text-lg font-semibold text-green-400">
-                  {lastSession.total > 0
-                    ? Math.round((lastSession.correct / lastSession.total) * 100)
-                    : 0}%
-                </p>
-                <p className="text-xs text-gray-500">
-                  ({lastSession.correct} correct / {lastSession.incorrect} incorrect)
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
+  <div className="mb-8 bg-slate-800 rounded-xl p-4 sm:p-6 border border-slate-700">
+    <h3 className="text-lg sm:text-xl font-bold text-white mb-4">Recent Study Session</h3>
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-700/50 p-4 rounded-lg gap-4">
+      <div className="flex-1">
+        <p className="text-sm text-gray-400">Deck</p>
+        <p className="text-base sm:text-lg font-semibold text-white break-words">{lastSession.deckName}</p>
+      </div>
+      <div className="text-left sm:text-right">
+        <p className="text-sm text-gray-400">Accuracy</p>
+        <p className="text-lg sm:text-xl font-semibold text-green-400">
+          {lastSession.total > 0
+            ? Math.round((lastSession.correct / lastSession.total) * 100)
+            : 0}%
+        </p>
+        <p className="text-xs text-gray-500">
+          ({lastSession.correct} correct / {lastSession.incorrect} incorrect)
+        </p>
+      </div>
+    </div>
+  </div>
+)}
 
-        {/* Create Deck Section */}
-        <div className="mb-8 bg-slate-800 rounded-xl p-6">
-          <h3 className="text-xl font-bold text-white mb-4">Create a New Deck</h3>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <input
-              type="text"
-              value={newDeckName}
-              onChange={e => setNewDeckName(e.target.value)}
-              onKeyPress={e => e.key === 'Enter' && handleCreateDeck()}
-              placeholder="Enter deck name..."
-              className="flex-grow bg-slate-700 text-white rounded-lg p-3 text-sm border-2 border-slate-600 focus:border-blue-500 outline-none"
-            />
-            <button
-              onClick={handleCreateDeck}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center"
-            >
-              <Icon type="plus" />
-              <span className="ml-2">Create Deck</span>
-            </button>
-          </div>
-        </div>
+<div className="mb-8 bg-slate-800 rounded-xl p-6">
+  <h3 className="text-xl font-bold text-white mb-4">Create a New Deck</h3>
+  <div className="flex flex-col sm:flex-row gap-3">
+    <input
+      type="text"
+      value={newDeckName}
+      onChange={e => setNewDeckName(e.target.value)}
+      onKeyPress={e => e.key === 'Enter' && handleCreateDeck()}
+      placeholder="Enter deck name..."
+      className="flex-grow bg-slate-700 text-white rounded-lg p-3 text-sm border-2 border-slate-600 focus:border-blue-500 outline-none"
+    />
+    <button
+      onClick={handleCreateDeck}
+      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center"
+    >
+      <Icon type="plus" />
+      <span className="ml-2">Create Deck</span>
+    </button>
+  </div>
+</div>
 
         {/* Import Questions Section */}
         <div className="mb-8 bg-slate-800 rounded-xl p-6">
