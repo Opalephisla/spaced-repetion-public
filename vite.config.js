@@ -5,5 +5,6 @@ export default defineConfig({
   plugins: [react()],
   build: {
     outDir: 'dist'
-  }
+  },
+  publicDir: 'public'  // This ensures files in public/ are copied to dist/
 });
