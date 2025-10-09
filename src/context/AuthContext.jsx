@@ -64,7 +64,7 @@ export const AuthProvider = ({ children }) => {
 
       if (!tokenResponse.ok) {
         const errorData = await tokenResponse.json().catch(() => ({}));
-        const errorMessage = errorData.details || errorData.error || 'Failed to exchange code for tokens';
+        const errorMessage = errorData.details || errorData.error || `Server error: ${tokenResponse.status} ${tokenResponse.statusText}`;
         throw new Error(errorMessage);
       }
 
@@ -96,7 +96,21 @@ export const AuthProvider = ({ children }) => {
       
     } catch (error) {
       console.error('Authentication error:', error);
-      alert(`Authentication failed: ${error.message}`);
+      
+      // Provide more specific error messages based on the error type
+      let errorMessage = 'Authentication failed. Please try again.';
+      
+      if (error.message.includes('Server configuration error')) {
+        errorMessage = 'Server configuration issue. Please contact support.';
+      } else if (error.message.includes('Invalid state parameter')) {
+        errorMessage = 'Security validation failed. Please try signing in again.';
+      } else if (error.message.includes('Failed to exchange code for tokens')) {
+        errorMessage = 'Unable to complete authentication. Please check your network connection and try again.';
+      } else if (error.message.includes('Failed to get user profile')) {
+        errorMessage = 'Unable to retrieve user profile. Please try again.';
+      }
+      
+      alert(errorMessage);
     } finally {
       setIsLoading(false);
     }
