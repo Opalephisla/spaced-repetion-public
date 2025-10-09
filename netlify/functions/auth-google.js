@@ -36,10 +36,22 @@ exports.handler = async (event, context) => {
       };
     }
 
+    const clientId = process.env.GOOGLE_CLIENT_ID || process.env.VITE_GOOGLE_CLIENT_ID;
+    const clientSecret = process.env.GOOGLE_CLIENT_SECRET || process.env.VITE_GOOGLE_CLIENT_SECRET;
+
+    if (!clientId || !clientSecret) {
+      console.error('Missing Google OAuth credentials');
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ error: 'Server configuration error: Missing Google OAuth credentials' })
+      };
+    }
+
     // Create OAuth2 client
     const oauth2Client = new google.auth.OAuth2(
-      process.env.VITE_GOOGLE_CLIENT_ID,
-      process.env.VITE_GOOGLE_CLIENT_SECRET,
+      clientId,
+      clientSecret,
       redirect_uri
     );
 
@@ -57,7 +69,10 @@ exports.handler = async (event, context) => {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: 'Authentication failed' })
+      body: JSON.stringify({ 
+        error: 'Authentication failed',
+        details: error.message || 'Unknown error'
+      })
     };
   }
 };
