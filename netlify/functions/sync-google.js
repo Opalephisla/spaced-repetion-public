@@ -27,10 +27,29 @@ exports.handler = async (event, context) => {
     }
 
     const accessToken = authHeader.split(' ')[1];
+    const refreshToken = event.headers['x-refresh-token'] || event.headers['X-Refresh-Token'];
     
-    // Set up Google Drive API client
-    const oauth2Client = new google.auth.OAuth2();
-    oauth2Client.setCredentials({ access_token: accessToken });
+    // Set up Google Drive API client with proper credentials
+    const oauth2Client = new google.auth.OAuth2(
+      process.env.VITE_GOOGLE_CLIENT_ID,
+      process.env.VITE_GOOGLE_CLIENT_SECRET
+    );
+    
+    oauth2Client.setCredentials({ 
+      access_token: accessToken,
+      refresh_token: refreshToken
+    });
+    
+    // Set up token refresh callback
+    oauth2Client.on('tokens', (tokens) => {
+      if (tokens.refresh_token) {
+        // Store the new refresh token if provided
+        oauth2Client.setCredentials({
+          access_token: tokens.access_token,
+          refresh_token: tokens.refresh_token
+        });
+      }
+    });
     
     const drive = google.drive({ version: 'v3', auth: oauth2Client });
 
@@ -135,10 +154,32 @@ exports.handler = async (event, context) => {
 
   } catch (error) {
     console.error('Google sync error:', error);
+    
+    // Provide more detailed error information
+    let errorMessage = 'Sync failed';
+    let statusCode = 500;
+    
+    if (error.code === 401 || error.message?.includes('unauthorized') || error.message?.includes('invalid_token')) {
+      errorMessage = 'Token expired or invalid. Please re-authenticate.';
+      statusCode = 401;
+    } else if (error.code === 403 || error.message?.includes('insufficient permissions')) {
+      errorMessage = 'Insufficient permissions for Google Drive access';
+      statusCode = 403;
+    } else if (error.message?.includes('quota exceeded')) {
+      errorMessage = 'Google API quota exceeded. Please try again later.';
+      statusCode = 429;
+    } else if (error.message?.includes('network') || error.code === 'ENOTFOUND') {
+      errorMessage = 'Network error. Please check your connection.';
+      statusCode = 502;
+    }
+    
     return {
-      statusCode: 500,
+      statusCode,
       headers,
-      body: JSON.stringify({ error: 'Sync failed' })
+      body: JSON.stringify({ 
+        error: errorMessage,
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      })
     };
   }
 };
