@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
+import { AuthProvider } from './context/AuthContext';
 import { HomeView } from './views/HomeView';
 import { StudyView } from './views/StudyView';
 import { NotificationHistoryModal } from './views/NotificationHistoryModal';
 import { NotificationToast } from './components/NotificationToast';
+import { AuthCallback } from './components/AuthCallback';
 import { useNotifications } from './hooks/useNotifications';
 
 const AppContent = () => {
@@ -13,6 +15,13 @@ const AppContent = () => {
   const [showHistoryModal, setShowHistoryModal] = useState(false);
 
   useNotifications();
+
+  useEffect(() => {
+    const path = window.location.pathname;
+    if (path === '/auth/callback') {
+      setCurrentView('auth-callback');
+    }
+  }, []);
 
   const handleStartStudy = (session) => {
     setStudySession(session);
@@ -49,6 +58,8 @@ const AppContent = () => {
         />
       )}
 
+      {currentView === 'auth-callback' && <AuthCallback />}
+
       {currentView === 'home' && (
         <HomeView
           onStartStudy={handleStartStudy}
@@ -65,9 +76,11 @@ const AppContent = () => {
 
 function App() {
   return (
-    <AppProvider>
-      <AppContent />
-    </AppProvider>
+    <AuthProvider>
+      <AppProvider>
+        <AppContent />
+      </AppProvider>
+    </AuthProvider>
   );
 }
 
