@@ -15,11 +15,11 @@ export const DeckCard = ({ deck, dueCount, totalCount, onStart }) => {
   
   <div className="mb-4 text-sm text-gray-500">
     <div className="flex justify-between mb-2">
-      <span>Total Cards:</span>
+      <span>Total cards:</span>
       <span className="text-white font-semibold">{totalCount}</span>
     </div>
     <div className="flex justify-between">
-      <span>Due Now:</span>
+      <span>Due now:</span>
       <span className="text-yellow-500 font-semibold">{dueCount}</span>
     </div>
   </div>
@@ -28,7 +28,7 @@ export const DeckCard = ({ deck, dueCount, totalCount, onStart }) => {
     onClick={() => onStart(deck.id)}
     className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors"
   >
-    Start Studying
+    Start studying
   </button>
 </div>
   );
