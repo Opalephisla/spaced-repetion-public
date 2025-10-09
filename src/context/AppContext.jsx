@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { storage } from '../utils/storage';
+import { syncToGoogle, loadFromGoogle } from '../utils/googleSync';
 import { STORAGE_KEYS, INITIAL_DECKS, INITIAL_CARDS } from '../constants';
 
 const AppContext = createContext();
@@ -25,6 +26,10 @@ export const AppProvider = ({ children }) => {
   );
   const [inAppNotifs, setInAppNotifs] = useState([]);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [lastSyncTime, setLastSyncTime] = useState(() => 
+    storage.get('last_sync_time', null)
+  );
 
   // Persist to localStorage
   useEffect(() => { storage.set(STORAGE_KEYS.DECKS, decks); }, [decks]);
@@ -33,6 +38,7 @@ export const AppProvider = ({ children }) => {
   useEffect(() => { storage.set(STORAGE_KEYS.NOTIFICATIONS, notifications); }, [notifications]);
   useEffect(() => { storage.set(STORAGE_KEYS.NOTIFIED_IDS, notifiedIds); }, [notifiedIds]);
   useEffect(() => { storage.set(STORAGE_KEYS.LAST_SESSION, lastSession); }, [lastSession]);
+  useEffect(() => { storage.set('last_sync_time', lastSyncTime); }, [lastSyncTime]);
 
   // Initialize progress for new cards
   useEffect(() => {
@@ -76,6 +82,57 @@ export const AppProvider = ({ children }) => {
     setInAppNotifs(prev => prev.filter(n => n.id !== id));
   };
 
+  const syncWithGoogle = async () => {
+    setIsSyncing(true);
+    try {
+      const userData = {
+        decks,
+        cards,
+        progress,
+        notifications,
+        notifiedIds,
+        lastSession,
+        syncTimestamp: new Date().toISOString()
+      };
+
+      await syncToGoogle(userData);
+      setLastSyncTime(new Date().toISOString());
+      addNotification('Sync Success', 'Your data has been synced with Google Drive', 'success');
+    } catch (error) {
+      console.error('Sync failed:', error);
+      addNotification('Sync Failed', 'Failed to sync with Google Drive. Please try again.', 'error');
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  const loadFromGoogleDrive = async () => {
+    setIsSyncing(true);
+    try {
+      const response = await loadFromGoogle();
+      
+      if (response.userData) {
+        const { userData } = response;
+        setDecks(userData.decks || INITIAL_DECKS);
+        setCards(userData.cards || INITIAL_CARDS);
+        setProgress(userData.progress || {});
+        setNotifications(userData.notifications || []);
+        setNotifiedIds(userData.notifiedIds || []);
+        setLastSession(userData.lastSession || null);
+        setLastSyncTime(userData.syncTimestamp || new Date().toISOString());
+        
+        addNotification('Data Loaded', 'Your data has been loaded from Google Drive', 'success');
+      } else {
+        addNotification('No Data Found', 'No saved data found in Google Drive', 'info');
+      }
+    } catch (error) {
+      console.error('Load failed:', error);
+      addNotification('Load Failed', 'Failed to load data from Google Drive', 'error');
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
   const value = {
     decks,
     setDecks,
@@ -93,7 +150,11 @@ export const AppProvider = ({ children }) => {
     addNotification,
     dismissNotification,
     notificationsEnabled,
-    setNotificationsEnabled
+    setNotificationsEnabled,
+    isSyncing,
+    lastSyncTime,
+    syncWithGoogle,
+    loadFromGoogleDrive
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
