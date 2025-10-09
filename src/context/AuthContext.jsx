@@ -63,7 +63,9 @@ export const AuthProvider = ({ children }) => {
       });
 
       if (!tokenResponse.ok) {
-        throw new Error('Failed to exchange code for tokens');
+        const errorData = await tokenResponse.json().catch(() => ({}));
+        const errorMessage = errorData.details || errorData.error || 'Failed to exchange code for tokens';
+        throw new Error(errorMessage);
       }
 
       const tokens = await tokenResponse.json();
@@ -94,7 +96,7 @@ export const AuthProvider = ({ children }) => {
       
     } catch (error) {
       console.error('Authentication error:', error);
-      alert('Authentication failed. Please try again.');
+      alert(`Authentication failed: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
