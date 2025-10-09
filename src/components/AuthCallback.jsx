@@ -22,6 +22,9 @@ export const AuthCallback = () => {
         window.location.href = '/';
       }).catch(error => {
         console.error('Auth callback error:', error);
+        // Provide a fallback error message if error is undefined or has no message
+        const errorMessage = error?.message || 'Unknown authentication error occurred';
+        alert(`Authentication failed: ${errorMessage}`);
         window.location.href = '/';
       });
     }

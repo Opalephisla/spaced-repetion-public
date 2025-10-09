@@ -40,11 +40,18 @@ exports.handler = async (event, context) => {
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET || process.env.VITE_GOOGLE_CLIENT_SECRET;
 
     if (!clientId || !clientSecret) {
-      console.error('Missing Google OAuth credentials');
+      const missingEnvs = [];
+      if (!clientId) missingEnvs.push('GOOGLE_CLIENT_ID or VITE_GOOGLE_CLIENT_ID');
+      if (!clientSecret) missingEnvs.push('GOOGLE_CLIENT_SECRET or VITE_GOOGLE_CLIENT_SECRET');
+      
+      console.error(`Missing Google OAuth credentials: ${missingEnvs.join(', ')}`);
       return {
         statusCode: 500,
         headers,
-        body: JSON.stringify({ error: 'Server configuration error: Missing Google OAuth credentials' })
+        body: JSON.stringify({ 
+          error: 'Server configuration error: Missing Google OAuth credentials',
+          details: `Missing environment variables: ${missingEnvs.join(', ')}`
+        })
       };
     }
 
@@ -66,12 +73,24 @@ exports.handler = async (event, context) => {
 
   } catch (error) {
     console.error('Google OAuth error:', error);
+    
+    // Provide more specific error messages based on error type
+    let errorDetails = error.message || 'Unknown error';
+    
+    if (error.code === 'invalid_grant') {
+      errorDetails = 'Authorization code has expired or is invalid. Please try signing in again.';
+    } else if (error.code === 'invalid_client') {
+      errorDetails = 'Google OAuth client configuration error.';
+    } else if (error.code === 'invalid_request') {
+      errorDetails = 'Invalid OAuth request parameters.';
+    }
+    
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({ 
         error: 'Authentication failed',
-        details: error.message || 'Unknown error'
+        details: errorDetails
       })
     };
   }
