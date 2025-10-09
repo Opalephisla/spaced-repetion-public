@@ -11,19 +11,27 @@ export const syncToGoogle = async (userData) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${accessToken}`
+        'Authorization': `Bearer ${accessToken}`,
+        'X-Refresh-Token': refreshToken || ''
       },
       body: JSON.stringify({
-        userData,
-        refreshToken
+        userData
       })
     });
 
+    const result = await response.json();
+    
     if (!response.ok) {
-      throw new Error('Failed to sync data to Google');
+      if (response.status === 401) {
+        // Token expired, clear stored tokens
+        localStorage.removeItem('google_access_token');
+        localStorage.removeItem('google_refresh_token');
+        throw new Error('Authentication expired. Please sign in again.');
+      }
+      throw new Error(result.error || 'Failed to sync data to Google');
     }
 
-    return await response.json();
+    return result;
   } catch (error) {
     console.error('Error syncing to Google:', error);
     throw error;
@@ -43,15 +51,23 @@ export const loadFromGoogle = async () => {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
-        'X-Refresh-Token': refreshToken
+        'X-Refresh-Token': refreshToken || ''
       }
     });
 
+    const result = await response.json();
+    
     if (!response.ok) {
-      throw new Error('Failed to load data from Google');
+      if (response.status === 401) {
+        // Token expired, clear stored tokens
+        localStorage.removeItem('google_access_token');
+        localStorage.removeItem('google_refresh_token');
+        throw new Error('Authentication expired. Please sign in again.');
+      }
+      throw new Error(result.error || 'Failed to load data from Google');
     }
 
-    return await response.json();
+    return result;
   } catch (error) {
     console.error('Error loading from Google:', error);
     throw error;
