@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
 
     // Google OAuth 2.0 authorization URL
     const redirectUri = encodeURIComponent(window.location.origin + '/auth/callback');
-    const scope = encodeURIComponent('profile email https://www.googleapis.com/auth/drive.appdata');
+    const scope = encodeURIComponent('profile email https://www.googleapis.com/auth/drive.file');
     const responseType = 'code';
     const state = Math.random().toString(36).substring(2, 15);
     
