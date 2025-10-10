@@ -263,6 +263,49 @@ export const HomeView = ({ onStartStudy, onShowHistory }) => {
           )}
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="mt-16 bg-slate-800 border-t border-slate-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            <div className="flex items-center space-x-4">
+              <img src="/logo.svg" alt="LearnFlow" className="w-8 h-8" />
+              <span className="text-white font-semibold">LearnFlow</span>
+            </div>
+            
+            <div className="flex flex-wrap items-center justify-center space-x-6 text-sm">
+              <a
+                href="/about"
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                About
+              </a>
+              <a
+                href="/privacy"
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                Privacy Policy
+              </a>
+              <a
+                href="/terms"
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                Terms of Service
+              </a>
+              <a
+                href="mailto:contact@customs.best"
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                Support
+              </a>
+            </div>
+            
+            <div className="text-sm text-gray-400">
+              © 2024 LearnFlow. All rights reserved.
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
