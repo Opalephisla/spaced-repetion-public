@@ -65,7 +65,8 @@ exports.handler = async (event, context) => {
       try {
         const searchResponse = await drive.files.list({
           q: `name='${fileName}' and trashed=false`,
-          fields: 'files(id, name)'
+          fields: 'files(id, name)',
+          spaces: 'drive'
         });
         
         if (searchResponse.data.files.length > 0) {
@@ -88,8 +89,7 @@ exports.handler = async (event, context) => {
         // Create new file
         await drive.files.create({
           requestBody: {
-            name: fileName,
-            parents: ['appDataFolder']
+            name: fileName
           },
           media: {
             body: fileContent,
@@ -111,7 +111,8 @@ exports.handler = async (event, context) => {
       try {
         const searchResponse = await drive.files.list({
           q: `name='${fileName}' and trashed=false`,
-          fields: 'files(id, name)'
+          fields: 'files(id, name)',
+          spaces: 'drive'
         });
         
         if (searchResponse.data.files.length === 0) {
