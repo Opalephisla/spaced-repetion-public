@@ -6,6 +6,9 @@ import { StudyView } from './views/StudyView';
 import { NotificationHistoryModal } from './views/NotificationHistoryModal';
 import { NotificationToast } from './components/NotificationToast';
 import { AuthCallback } from './components/AuthCallback';
+import { PrivacyPolicyView } from './views/PrivacyPolicyView';
+import { TermsOfServiceView } from './views/TermsOfServiceView';
+import { AboutView } from './views/AboutView';
 import { useNotifications } from './hooks/useNotifications';
 
 const AppContent = () => {
@@ -20,6 +23,12 @@ const AppContent = () => {
     const path = window.location.pathname;
     if (path === '/auth/callback') {
       setCurrentView('auth-callback');
+    } else if (path === '/privacy') {
+      setCurrentView('privacy');
+    } else if (path === '/terms') {
+      setCurrentView('terms');
+    } else if (path === '/about') {
+      setCurrentView('about');
     }
   }, []);
 
@@ -59,6 +68,12 @@ const AppContent = () => {
       )}
 
       {currentView === 'auth-callback' && <AuthCallback />}
+
+      {currentView === 'privacy' && <PrivacyPolicyView />}
+
+      {currentView === 'terms' && <TermsOfServiceView />}
+
+      {currentView === 'about' && <AboutView />}
 
       {currentView === 'home' && (
         <HomeView
